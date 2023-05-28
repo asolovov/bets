@@ -1,1 +1,3 @@
-# Sample Hardhat Project
+# Bets prototype
+
+TODO: add readme
