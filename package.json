@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "styled-components": "^5.3.11"
   }
 }

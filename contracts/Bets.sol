@@ -81,6 +81,11 @@ contract Bets is Ownable {
         _minBet = minBet;
     }
 
+    // Returns nex game ID
+    function nextGameID() external view returns(uint256) {
+        return _nextGameID;
+    }
+
     /*
      * Allows to get current minimum bet for all games
      *
@@ -161,7 +166,9 @@ contract Bets is Ownable {
      * Allows to enter created game. Caller will be `Game-user2` player
      *
      * Requirements:
+     * - game should have not zero address for `user1`
      * - game should have `user2` field as a zero address
+     * - caller should not be `user1`
      *
      * @dev sets is `_games` mapping by given `id` fields `user2` to caller address, `stage` to `Stage.ROUND1`, `turn`
      * to `TURN.USER1` and `throwing` to true
@@ -171,7 +178,9 @@ contract Bets is Ownable {
      * @emits `ChangeGameStage` event with game `id` and `Stage.ROUND1` stage
      */
     function enterGame(uint256 id) external {
+        require(_games[id].user1 != address(0), "Bets: game not found");
         require(_games[id].user2 == address(0), "Bets: game already has second player");
+        require(_games[id].user1 != msg.sender, "Bets: cannot join own game");
 
         _games[id].user2 = msg.sender;
         _games[id].stage = Stage.ROUND1;
@@ -313,8 +322,10 @@ contract Bets is Ownable {
 
         if (_games[id].user1 == msg.sender) {
             payable(_games[id].user2).transfer(value);
+            _games[id].winner = _games[id].user2;
         } else {
             payable(_games[id].user1).transfer(value);
+            _games[id].winner = _games[id].user1;
         }
 
         _games[id].stage = Stage.FINISHED;
